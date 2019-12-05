@@ -71,8 +71,6 @@ INSERT INTO METADATA
   ('SAMN03081531', 'NZ_CP007176', 3054, 2889, '2014-02-12', '2019-08-27', 'Staphylococcus aureus'),
   ('SAMN02604235', 'CP000253', 2872, 2767, '2006-02-13', '2016-08-03', 'Staphylococcus aureus');
 
-INSERT INTO STRAINS VALUES ('NZ_CP033506', 'ATCC 5-finger-death-punch', 'MRSA');
-
 INSERT INTO GENES
   VALUES
   ('mecA', 'CP033506'),

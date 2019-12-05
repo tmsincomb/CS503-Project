@@ -1,0 +1,5 @@
+select * from strains;
+
+INSERT INTO STRAINS VALUES ('NZ_CP0335071', 'ATCC NOVEL', 'MRSA');
+
+UPDATE STRAINS SET strain_resistance_status = 'MSSA' WHERE strain_id = 'NZ_CP0335071';
