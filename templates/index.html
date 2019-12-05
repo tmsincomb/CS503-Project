@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schema</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="schema">
+    <a href="/schema"><h1>VIEW SCHEMA</h1></a>
+</div>
+<br></br>
+<div>
+    <h1>INSERT</h1>
+    <select name="insert" method="GET" action="/">
+        {% for tablename in tablenames %}
+        <option value= "{{tablename}}" SELECTED>{{tablename}}</option>"
+        {% endfor %}
+    </select>
+</div>
+<div>
+    <h1>UPDATE</h1>
+    <select name="update" method="GET" action="/">
+        {% for tablename in tablenames %}
+        <option value= "{{tablename}}" SELECTED>{{tablename}}</option>"
+        {% endfor %}
+    </select>
+</div>
+<div class="form">
+    <h1>CUSTOM QUERY</h1>
+    <form action="/" method="POST">
+        <input type="text" name="query" style="width: 500px;" /></br>
+        <input type="submit" value="RUN SQL QUERY" />
+    </form>
+</div>
+<div class="form">
+    <h1>CUSTOM MODIFICATION</h1>
+    <form action="/" method="POST">
+        <input type="text" name="command" style="width: 500px;" /></br>
+        <input type="submit" value="RUN SQL COMMAND" />
+    </form>
+</div>
+</body>
+<footer></footer>
+</html>

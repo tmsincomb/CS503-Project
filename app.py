@@ -1,26 +1,64 @@
 #!/usr/bin/env python3
-from flask import Flask, render_template, render_template_string
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, render_template_string, request, redirect, jsonify
+from src.mysql_connector import MysqlConnector
+from src.forms import InsertForm, UpdateForm
+import os
 
+SECRET_KEY = os.urandom(32)
 app = Flask(__name__)
-# TODO: link this to a .mypass file
-# app.config['MYSQLALCHEMY_DATABASE_URI'] = 'mysql://root:water@localhost/CS503'
-db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = SECRET_KEY
+db = MysqlConnector(app)
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        if request.form.get('query'):
+            sql_command = request.form['query']
+            df = db.get(sql_command)
+            return df.to_html()
+        if request.form.get('command'):
+            sql_command = request.form['command']
+            resp = db.post(sql_command)
+            result = f'success -> affected {resp.rowcount} rows'
+            return render_template_string(result)
+        if request.form.get('insert'):
+            sql_command = request.form['insert']
+            # redirect
+        if request.form.get('update'):
+            sql_command = request.form['update']
+            # redirect
+    database = db.descibe_database()
+    tablenames, tables = zip(*database)
+    return render_template('index.html', tablenames=tablenames, )
 
-# @app.route('/modifier')
-# def users():
-#     conn = db.cursor()
-#     command = '''INSERT user, host FROM mysql.user'''
-#     conn.execute(command)
-#     rv = conn.fetchall()
-#     return command, str(rv)
+@app.route('/schema', methods=['GET', 'POST'])
+def schema():
+    database = db.descibe_database()
+    tablenames, tables = zip(*database)
+    # Need na for white space problem
+    tablenames =  ['na'] + list(tablenames)
+    tables = [table.to_html() for table in tables]
+    return render_template('schema.html', tables=tables, tablenames=tablenames)
 
+@app.route('/insert/<tablename>')
+def insert(tablename):
+    table = db.get_table(tablename)
+    return render_template_string(tablename)
+    table['_type'] = table['type'].apply(lambda t: str(t).split()[0])
+    fields = [{'gene_name':'', 'gene_type':''}]
+    # form = InsertForm(fields=table[['name', '_type']].to_dict('records'))
+    form = InsertForm(fields=fields)
+    # print(table.to_dict('records'))
+    for field in form.fields:
+        print(vars(field))
+    #     print(field.object_data['name'])
+    #     print(str(field.object_data['_type']))
+    # print(vars(form.fields[0].label))
+    return render_template('insert_form.html', form=form)
 
-@app.route('/')
-def users():
-    return render_template_string('here')
-
+@app.route('/update')
+def update():
+    return render_template('update_form.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
