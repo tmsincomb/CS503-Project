@@ -14,12 +14,17 @@ def index():
     if request.method == 'POST':
         if request.form.get('query'):
             sql_command = request.form['query']
-            df = db.get(sql_command)
+            resp_code, df = db.get(sql_command)
+            if not resp_code:
+                return render_template_string(f'FAILED -> {df}')
             return df.to_html()
         if request.form.get('command'):
             sql_command = request.form['command']
-            resp = db.post(sql_command)
-            result = f'success -> affected {resp.rowcount} rows'
+            resp_code, resp = db.post(sql_command)
+            if resp_code == 1:
+                result = f'SUCCESS -> affected {resp.rowcount} rows'
+            else:
+                result = f'FAILED -> {resp}'
             return render_template_string(result)
         if request.form.get('insert'):
             sql_command = request.form['insert']
@@ -35,6 +40,8 @@ def index():
 def schema():
     database = db.descibe_database()
     tablenames, tables = zip(*database)
+    for table in tables:
+        table['type'] = table['type'].apply(lambda t: str(t).split()[0])
     # Need na for white space problem
     tablenames =  ['na'] + list(tablenames)
     tables = [table.to_html() for table in tables]

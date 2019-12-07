@@ -1,5 +1,5 @@
 from flask_table import Table, Col
-from sqlalchemy import create_engine, inspect, Table, Column
+from sqlalchemy import create_engine, inspect, Table, Column, exc
 from collections import defaultdict
 import pandas as pd
 
@@ -10,21 +10,26 @@ class MysqlConnector:
         self.engine = create_engine(db_url)
 
     def get(self, query: str) -> pd.DataFrame:
-        df = pd.read_sql(query, self.engine)
-        return df
-
+        try:
+            df = pd.read_sql(query, self.engine)
+            return 1, df
+        except exc.SQLAlchemyError as e:
+            return 0, e
+            
     def post(self, command: str) -> pd.DataFrame:
         connection = self.engine.connect()
         trans = connection.begin()
-        # try:
-        resp = connection.execute(command)
-        trans.commit()
-        connection.close()
-        return resp
-        # except:
-        #     print('OOPS')
-        #     trans.rollback()
-        #     connection.close()
+        try:
+            resp = connection.execute(command)
+            trans.commit()
+            connection.close()
+            return 1, resp
+        except exc.SQLAlchemyError as e:
+            # print(exc.SQLAlchemyError)
+            trans.rollback()
+            connection.close()
+            return 0, e
+
 
     def descibe_database(self):
         inspector = inspect(self.engine)
