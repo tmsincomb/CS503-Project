@@ -7,12 +7,14 @@
 {% block content %}
 
 <h2>Insert Row</h2>
-<form action="/" method="post">
+<form action="" method="post">
     <fieldset>
-    {% for field in form.fields %}
-        {{ field.object_data['name'] }}
-        {{ field.object_data['type'] }}
-        {{ field }}
+    {% for i in range(table_len) %}
+        {{ form.hidden_tag() }}
+        {{ headers[i] }} {{ '|' }} {{ types[i] }}
+        <br/>
+        {{ form[headers[i]] }}
+        <br/>
     {% endfor %}
     <p>{{form.submit()}}</p>
     </fieldset>

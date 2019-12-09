@@ -5,8 +5,9 @@ import pandas as pd
 
 class MysqlConnector:
 
-    def __init__(self, app):
-        db_url = 'mysql+mysqlconnector://root:water@localhost/SAureus'
+    def __init__(self, app, db_url=None):
+        if not db_url:
+            db_url = 'mysql+mysqlconnector://root:water@localhost/SAureus'
         self.engine = create_engine(db_url)
 
     def get(self, query: str) -> pd.DataFrame:
@@ -15,7 +16,7 @@ class MysqlConnector:
             return 1, df
         except exc.SQLAlchemyError as e:
             return 0, e
-            
+
     def post(self, command: str) -> pd.DataFrame:
         connection = self.engine.connect()
         trans = connection.begin()
@@ -30,7 +31,6 @@ class MysqlConnector:
             connection.close()
             return 0, e
 
-
     def descibe_database(self):
         inspector = inspect(self.engine)
         database = []
@@ -42,3 +42,7 @@ class MysqlConnector:
     def get_table(self, tablename):
         inspector = inspect(self.engine)
         return pd.DataFrame(inspector.get_columns(tablename))
+
+    def update_table(self, table, tablename):
+        resp = table.to_sql(tablename, self.engine, if_exists="replace")
+        return resp

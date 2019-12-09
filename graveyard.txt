@@ -1,0 +1,14 @@
+<!-- <script>
+    $(function() {
+        $.ajax({
+            url: '{{ url_for("autocomplete") }}'
+            }).done(function (data){
+                $('#entity_autocomplete').autocomplete({
+                    source: data,
+                    minLength: 2
+                });
+            });
+        });
+</script> -->
+
+{{ form.autocomp.label }}: {{ form.autocomp }}
